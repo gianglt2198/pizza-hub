@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"os/signal"
@@ -19,10 +20,12 @@ import (
 
 func main() {
 	// Load config
-	cfg, err := config.Load("")
+	cfg, err := config.Load()
 	if err != nil {
 		log.Fatalf("failed to load config: %v", err)
 	}
+
+	fmt.Println(cfg)
 
 	// Connect PostgreSQL
 	ctx := context.Background()

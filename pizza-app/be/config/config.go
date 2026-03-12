@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/spf13/viper"
@@ -21,24 +22,26 @@ type AppConfig struct {
 
 type DatabaseConfig struct {
 	// PostgreSQL
-	DBHost     string `envconfig:"db_host" default:"localhost"`
-	DBPort     string `envconfig:"db_port" default:"5432"`
-	DBUser     string `envconfig:"db_user" default:"pizza"`
-	DBPassword string `envconfig:"db_password" default:"pizza123"`
-	DBName     string `envconfig:"db_name" default:"pizzahub"`
-	DBSSLMode  string `envconfig:"db_ssl_mode" default:"disable"`
+	DBHost     string `mapstructure:"host"`
+	DBPort     string `mapstructure:"port"`
+	DBUser     string `mapstructure:"user"`
+	DBPassword string `mapstructure:"password"`
+	DBName     string `mapstructure:"name"`
+	DBSSLMode  string `mapstructure:"ssl_mode"`
 }
 
 type RedisConfig struct {
 	// Redis
-	RedisHost     string `envconfig:"redis_host" default:"localhost"`
-	RedisPort     string `envconfig:"redis_port" default:"6379"`
-	RedisPassword string `envconfig:"redis_password" default:""`
+	RedisHost     string `mapstructure:"host"`
+	RedisPort     string `mapstructure:"port"`
+	RedisPassword string `mapstructure:"password"`
 }
 
 // Load loads configuration from file and environment variables
-func Load(configPath string) (*Config, error) {
+func Load() (*Config, error) {
 	v := viper.New()
+
+	configPath := os.Getenv("CONFIG_PATH")
 
 	// Set config file path
 	if configPath != "" {
@@ -52,7 +55,7 @@ func Load(configPath string) (*Config, error) {
 
 	// Enable environment variable support
 	v.AutomaticEnv()
-	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+	v.SetEnvKeyReplacer(strings.NewReplacer(".", "__"))
 
 	// Read config file
 	if err := v.ReadInConfig(); err != nil {

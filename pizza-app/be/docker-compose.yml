@@ -7,7 +7,7 @@ services:
       POSTGRES_PASSWORD: pizza123
       POSTGRES_DB: pizzahub
     ports:
-      - "5432:5432"
+      - "5435:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./db/migrations/000001_init_schema.up.sql:/docker-entrypoint-initdb.d/init.sql
@@ -24,7 +24,7 @@ services:
     container_name: pizza-redis
     command: redis-server --appendonly yes
     ports:
-      - "6379:6379"
+      - "6377:6379"
     volumes:
       - redis_data:/data
     healthcheck:
@@ -40,19 +40,13 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: pizza-app
+    working_dir: /app
     ports:
-      - "8080:8080"
-    environment:
-      SERVER_PORT: "8080"
-      ENV: production
-      DB_HOST: postgres
-      DB_PORT: "5432"
-      DB_USER: pizza
-      DB_PASSWORD: pizza123
-      DB_NAME: pizzahub
-      DB_SSL_MODE: disable
-      REDIS_HOST: redis
-      REDIS_PORT: "6379"
+      - "8083:8080"
+    env_file:
+      - ".env"
+    volumes:
+      - ./config.yaml:/app/config.yaml:ro
     depends_on:
       postgres:
         condition: service_healthy
