@@ -42,9 +42,9 @@ output "node_groups" {
   description = "EKS node groups"
   value = {
     for k, v in aws_eks_node_group.node : k => {
-      arn           = v.arn
-      status        = v.status
-      capacity_type = v.capacity_type
+      arn            = v.arn
+      status         = v.status
+      capacity_type  = v.capacity_type
       instance_types = v.instance_types
     }
   }
@@ -56,6 +56,6 @@ output "cluster_security_group_id" {
 }
 
 output "node_security_group_id" {
-  description = "ID of the EKS node security group"  
+  description = "ID of the EKS node security group"
   value       = aws_security_group.node.id
 }

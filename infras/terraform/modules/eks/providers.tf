@@ -1,13 +1,13 @@
 data "aws_eks_cluster" "cluster" {
-  name = "${var.cluster_name}"
+  name = var.cluster_name
 
-  depends_on = [module.eks]
+  depends_on = [aws_eks_cluster.cluster]
 }
 
 data "aws_eks_cluster_auth" "cluster" {
-  name = "${var.cluster_name}"
+  name = var.cluster_name
 
-  depends_on = [module.eks]
+  depends_on = [aws_eks_cluster.cluster]
 }
 
 provider "kubernetes" {

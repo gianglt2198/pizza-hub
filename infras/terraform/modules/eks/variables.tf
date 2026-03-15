@@ -6,14 +6,14 @@ variable "cluster_name" {
 variable "cluster_version" {
   description = "Kubernetes version"
   type        = string
-   default     = "1.35"  
+  default     = "1.35"
 
-  validation {  
-    condition = contains([  
+  validation {
+    condition = contains([
       "1.35"
-    ], var.cluster_version)  
-    error_message = "Kubernetes version must be 1.35."  
-  }  
+    ], var.cluster_version)
+    error_message = "Kubernetes version must be 1.35."
+  }
 }
 
 variable "cluster_endpoint_private_access" {
@@ -37,10 +37,10 @@ variable "subnet_ids" {
   description = "List of subnet IDs"
   type        = list(string)
 
-    validation {  
-    condition     = length(var.subnet_ids) >= 2  
-    error_message = "At least 2 subnets are required for high availability."  
-  }  
+  validation {
+    condition     = length(var.subnet_ids) >= 2
+    error_message = "At least 2 subnets are required for high availability."
+  }
 }
 
 variable "enable_irsa" {
@@ -49,36 +49,36 @@ variable "enable_irsa" {
   default     = true
 }
 
-variable "node_groups" {  
-  description = "Map of EKS node group configurations"  
-  type = map(object({  
-    desired_capacity = number  
-    max_capacity     = number  
-    min_capacity     = number  
-    instance_types   = list(string)  
-    capacity_type    = optional(string, "ON_DEMAND")  
-    disk_size        = optional(number, 20)  
-    labels           = optional(map(string), {})  
-    taints = optional(list(object({  
-      key    = string  
-      value  = string  
-      effect = string  
-    })), [])  
-  }))  
+variable "node_groups" {
+  description = "Map of EKS node group configurations"
+  type = map(object({
+    desired_capacity = number
+    max_capacity     = number
+    min_capacity     = number
+    instance_types   = list(string)
+    capacity_type    = optional(string, "ON_DEMAND")
+    disk_size        = optional(number, 20)
+    labels           = optional(map(string), {})
+    taints = optional(list(object({
+      key    = string
+      value  = string
+      effect = string
+    })), [])
+  }))
 
-  validation {  
-    condition = alltrue([  
-      for k, v in var.node_groups : v.min_capacity <= v.desired_capacity && v.desired_capacity <= v.max_capacity  
-    ])  
-    error_message = "Node group capacity must satisfy: min <= desired <= max."  
-  }  
-}  
+  validation {
+    condition = alltrue([
+      for k, v in var.node_groups : v.min_capacity <= v.desired_capacity && v.desired_capacity <= v.max_capacity
+    ])
+    error_message = "Node group capacity must satisfy: min <= desired <= max."
+  }
+}
 
-variable "public_access_cidrs" {  
-  description = "List of CIDR blocks that can access the EKS cluster endpoint"  
-  type        = list(string)  
-  default     = ["0.0.0.0/0"]  
-}  
+variable "public_access_cidrs" {
+  description = "List of CIDR blocks that can access the EKS cluster endpoint"
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
+}
 
 
 variable "tags" {
@@ -89,11 +89,11 @@ variable "tags" {
 
 variable "add_ons" {
   description = "Map of EKS add-on configurations"
-  type = map(any)
+  type        = map(any)
   default = {
-     coredns = {}
-     eks-pod-identity-agent = {}
-     kube-proxy = {}
-     vpc-cni = { }
+    coredns                = {}
+    eks-pod-identity-agent = {}
+    kube-proxy             = {}
+    vpc-cni                = {}
   }
 }

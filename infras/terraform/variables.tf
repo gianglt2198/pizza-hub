@@ -50,4 +50,29 @@ variable "private_subnet_cidrs" {
     condition     = length(var.private_subnet_cidrs) >= 2
     error_message = "At least 2 private subnets are required for high availability."
   }
-}  
+}
+
+variable "database_name" {
+  description = "Initial database name"
+  type        = string
+  default     = "pizzahub"
+}
+
+variable "database_username" {
+  description = "Username for Database"
+  type        = string
+  default     = "pizza"
+}
+
+variable "rds_engine_version" {
+  description = "RDS engine version"
+  type        = string
+  default     = "15.4"
+}
+
+variable "rds_engine_version_major" {
+  description = "RDS engine version major"
+  type        = string
+  default     = "15"
+}
+

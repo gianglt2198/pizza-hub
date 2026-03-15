@@ -13,3 +13,33 @@ output "cluster_name" {
   description = "The name of the EKS cluster"
   value       = module.eks.cluster_name
 }
+
+
+output "rds_endpoint" {  
+  value = module.rds.db_endpoint  
+}  
+
+output "rds_port" {  
+  value = module.rds.db_port  
+}  
+
+output "rds_database_name" {  
+  value = module.rds.db_name  
+}  
+
+output "rds_secret_arn" {  
+  description = "ARN of the secret containing RDS credentials"  
+  value       = module.rds.secret_manager_secret_arn  
+}  
+
+output "rds_password" {  
+  description = "Master password for the RDS instance"  
+  value       = module.rds.db_password  
+  sensitive   = true  
+}  
+
+output "rds_connection_string" {  
+  description = "Connection string for the RDS instance"  
+  value       = module.rds.db_connection_string  
+  sensitive   = true  
+}
