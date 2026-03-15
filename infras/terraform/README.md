@@ -77,6 +77,14 @@ The VPC module creates a secure and isolated network environment for the applica
 
 The EKS module provisions a managed Kubernetes cluster. For detailed information on its configuration, including node groups, IAM roles, and security settings.
 
+### [RDS](./modules/rds/README.md)
+
+The RDS module sets up a managed PostgreSQL database. See its README for details on security, high availability, and configuration.
+
+### [Redis](./modules/redis/README.md)
+
+The Redis module provides a high-performance caching layer using ElastiCache for Redis. Refer to its README for architecture and setup details.
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](../../LICENSE) file for details.

@@ -76,3 +76,15 @@ variable "rds_engine_version_major" {
   default     = "15"
 }
 
+
+variable "redis_engine_version" {
+  description = "Redis engine version for ElastiCache"
+  type        = string
+  default     = "7.0"
+}
+
+variable "redis_node_type" {
+  description = "Redis node type for ElastiCache"
+  type        = string
+  default     = "cache.t3.micro"
+}

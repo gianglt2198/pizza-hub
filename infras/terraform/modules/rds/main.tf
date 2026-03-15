@@ -250,7 +250,9 @@ resource "aws_iam_role" "rds_enhanced_monitoring" {
     ]
   })
 
-  tags = var.tags
+  tags = merge(var.tags, {
+    Name = "${var.identifier}-rds-enhanced-monitoring-role"
+  })
 }
 
 resource "aws_iam_role_policy_attachment" "rds_enhanced_monitoring" {
@@ -266,5 +268,7 @@ resource "aws_cloudwatch_log_group" "postgresql" {
   retention_in_days = var.log_retention_days
   kms_key_id        = aws_kms_key.rds.arn
 
-  tags = var.tags
+  tags = merge(var.tags, {
+    Name = "${var.identifier}-rds-postgresql-logs"
+  })
 }  
