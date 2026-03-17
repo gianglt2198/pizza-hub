@@ -80,3 +80,5 @@ module "eks" {
 
 #   tags = local.common_tags
 # }
+
+resource "null_resource" "example" {}
