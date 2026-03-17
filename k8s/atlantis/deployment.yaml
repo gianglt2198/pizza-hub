@@ -1,0 +1,54 @@
+apiVersion: apps/v1  
+kind: Deployment  
+metadata:  
+  name: atlantis  
+  namespace: atlantis  
+spec:  
+  replicas: 1  
+  selector:  
+    matchLabels:  
+      app: atlantis  
+  template:  
+    metadata:  
+      labels:  
+        app: atlantis  
+    spec:  
+      serviceAccountName: atlantis  
+      containers:  
+      - name: atlantis  
+        image: runatlantis/atlantis:latest  
+        ports:  
+        - containerPort: 4141  
+        env:  
+        - name: ATLANTIS_GH_USER  
+          value: gianglt1  
+        - name: ATLANTIS_GH_TOKEN  
+          valueFrom:  
+            secretKeyRef:  
+              name: atlantis-secrets  
+              key: github-token  
+        - name: ATLANTIS_GH_WEBHOOK_SECRET  
+          valueFrom:  
+            secretKeyRef:  
+              name: atlantis-secrets  
+              key: github-webhook-secret  
+        - name: ATLANTIS_REPO_ALLOWLIST  
+          value: "github.com/gianglt1/pizza-hub"  
+        - name: ATLANTIS_ATLANTIS_URL  
+          value: "https://your-atlantis-domain"  
+        - name: ATLANTIS_DATA_DIR  
+          value: "/atlantis-data"  
+        volumeMounts:  
+        - name: atlantis-data  
+          mountPath: /atlantis-data  
+        resources:  
+          requests:  
+            memory: "512Mi"  
+            cpu: "250m"  
+          limits:  
+            memory: "1Gi"  
+            cpu: "500m"  
+      volumes:  
+      - name: atlantis-data  
+        persistentVolumeClaim:  
+          claimName: atlantis-pvc 
