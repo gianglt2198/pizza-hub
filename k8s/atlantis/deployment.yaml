@@ -33,7 +33,7 @@ spec:
                   name: atlantis-secrets
                   key: github-webhook-secret
             - name: ATLANTIS_REPO_ALLOWLIST
-              value: "github.com/gianglt1/pizza-hub"
+              value: "github.com/gianglt2198/pizza-hub"
             - name: ATLANTIS_ATLANTIS_URL
               value: "https://unalcoholized-zoie-semifine.ngrok-free.dev"
             - name: ATLANTIS_DATA_DIR
