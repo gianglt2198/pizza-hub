@@ -1,0 +1,43 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../base
+
+namespace: pizza-hub
+
+# Remove in-cluster databases for production  
+patches:  
+- target:  
+    version: v1  
+    kind: Deployment  
+    name: postgres  
+  path: remove-postgres.yaml  
+- target:  
+    version: v1  
+    kind: Deployment   
+    name: redis  
+  path: remove-redis.yaml 
+
+
+configMapGenerator:  
+- name: pizza-config  
+  behavior: replace  
+  literals:  
+  - ENV=production  
+  - DB_HOST=pizza-hub-prod.cluster-xxxxx.us-west-2.rds.amazonaws.com  # RDS endpoint  
+  - DB_PORT=5432  
+  - DB_SSL_MODE=require  
+  - REDIS_HOST=pizza-hub-prod.xxxxx.cache.amazonaws.com  # ElastiCache endpoint  
+  - REDIS_PORT=6379  
+  - SERVER_PORT=8080  
+
+
+images:  
+- name: pizza-app  
+  newName: gianglt1/pizza-hub-app  
+  newTag: v1.0.0  # Stable production tag  
+
+replicas:  
+- name: pizza-app  
+  count: 3  # Multiple replicas for production  

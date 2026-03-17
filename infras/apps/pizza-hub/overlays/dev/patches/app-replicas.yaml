@@ -1,0 +1,6 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pizza-app
+spec:
+  replicas: 1  # Single replica for dev

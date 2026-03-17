@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pizza-app-config-file
+  namespace: pizza-hub
+data:
+  config.yaml: |
+    app:
+      server_port: 8080
+      env: dev
+    
+    database:
+      host: localhost
+      port: 5432
+      user: pizza
+      password: pizza123
+      name: pizzahub
+      ssl_mode: disable
+    
+    redis:
+      host: localhost
+      port: 6377
+      password: 

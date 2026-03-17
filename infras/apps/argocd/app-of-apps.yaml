@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1  
+kind: Application  
+metadata:  
+  name: pizza-hub-apps  
+  namespace: argocd  
+spec:  
+  project: default  
+  source: 
+    repoURL: 'https://github.com/pizza-hub/pizza-hub.git'
+    targetRevision: HEAD
+    path: infras/apps/argocd/applications
+
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: argocd
+  
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
