@@ -1,0 +1,39 @@
+version: 3
+automerge: false  
+delete_source_branch_on_merge: true  
+parallel_plan: true  
+parallel_apply: false  
+
+projects:
+  - name: pizza-hub-dev
+    dir: ./infras/terraform
+    workspace: dev
+    terraform_version: v1.5.0
+    autoplan:
+      when_modified: ["*.tf", "environments/dev/**/*", modules/**/*"]
+      enabled: true
+    apply_requirements: [approved, mergeable]
+    workflow: pizza-hub
+  - name: pizza-hub-prod
+    dir: ./infras/terraform
+    workspace: prod
+    terraform_version: v1.5.0
+    autoplan:
+      when_modified: ["*.tf", "environments/prod/**/*", modules/**/*"]
+      enabled: true
+    apply_requirements: [approved, mergeable]
+    workflow: pizza-hub
+workflows:
+  pizza-hub:
+    plan:
+      steps:
+        - init:
+            extra_args: ["-upgrade"]
+        - run: |  
+            echo "Current workspace: $WORKSPACE"  
+        - plan:
+            extra_args: ["-var-file=environments/${WORKSPACE}/terraform.tfvars"]
+    apply:
+      steps:
+        - apply:
+            extra_args: ["-var-file=environments/${WORKSPACE}/terraform.tfvars"]
