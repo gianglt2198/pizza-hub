@@ -1,0 +1,58 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+
+metadata:
+  name: pizza-hub-environments
+  namespace: argocd
+
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+    - git:
+        repoURL: 'https://github.com/gianglt2198/pizza-hub.git'
+        revision: HEAD
+        directories:
+          - path: infras/apps/pizza-hub/overlays/*
+    ###### Example of list generator for multiple environments (uncomment and adjust as needed) ######
+    # - list:
+    #     elements:
+    #     - env: dev
+    #       server: 'https://kubernetes.default.svc'
+    #       namespace: pizza-hub-dev
+    #       repoRevision: HEAD
+    #     - env: prod
+    #       server: 'https://kubernetes.default.svc'
+    #       namespace: pizza-hub-prod
+    #       repoRevision: v1.0.0
+
+
+  template:
+    metadata:
+      name: 'pizza-hub-{{path.basename}}'
+      labels:
+        environment: '{{path.basename}}'
+        app: pizza-hub
+    spec:
+      project: default
+      source:
+        repoURL: 'https://github.com/gianglt2198/pizza-hub.git'
+        targetRevision: 'HEAD'
+        path: '{{path}}'
+      destination:
+        server: 'https://kubernetes.default.svc'
+        namespace: 'pizza-hub-{{path.basename}}'
+
+      # Sync policy
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+        retry:
+          limit: 5
+          backoff:
+            duration: "5s"
+            factor: 2
+            maxDuration: "3m"

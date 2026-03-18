@@ -6,9 +6,9 @@ metadata:
 spec:  
   project: default  
   source: 
-    repoURL: 'https://github.com/pizza-hub/pizza-hub.git'
+    repoURL: 'https://github.com/gianglt2198/pizza-hub.git'
     targetRevision: HEAD
-    path: infras/apps/argocd/applications
+    path: infras/apps/argocd/appsets
 
   destination:
     server: 'https://kubernetes.default.svc'

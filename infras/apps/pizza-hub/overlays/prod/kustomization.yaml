@@ -11,13 +11,24 @@ patches:
 - target:  
     version: v1  
     kind: Deployment  
-    name: postgres  
-  path: remove-postgres.yaml  
+    name: postgres 
+  # path: patches/remove-postgres.yaml 
+  patch: |-  
+    - op: remove  
+      path: /spec
 - target:  
     version: v1  
     kind: Deployment   
     name: redis  
-  path: remove-redis.yaml 
+  # path: patches/remove-redis.yaml
+  patch: |-  
+    - op: remove  
+      path: /spec 
+
+
+patchesStrategicMerge:
+  - patches/app-replicas.yaml
+  - patches/resources-limits.yaml
 
 
 configMapGenerator:  
@@ -37,7 +48,3 @@ images:
 - name: pizza-app  
   newName: gianglt1/pizza-hub-app  
   newTag: v1.0.0  # Stable production tag  
-
-replicas:  
-- name: pizza-app  
-  count: 3  # Multiple replicas for production  
