@@ -2,6 +2,14 @@
 
 ## SETUP ARGOCD APPLICATION
 Prequisites:
+- Tools:
+```bash
+# Install ArgoCD CLI
+brew install argocd
+
+# Install helm (optional, if using Helm charts)
+brew install helm
+```
 - ArgoCD installed and configured in your Kubernetes cluster.
 ```bash
 # Create ArgoCD namespace

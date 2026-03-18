@@ -1,0 +1,33 @@
+# Development environment overrides
+app:
+  image:
+    tag: "dev-latest"
+  replicaCount: 1
+  
+  env:
+    ENV: "development"
+    
+  resources:
+    requests:
+      memory: "32Mi"
+      cpu: "25m"
+    limits:
+      memory: "64Mi"
+      cpu: "100m"
+
+# Use in-cluster databases for dev
+postgresql:
+  enabled: true
+  
+redis:
+  enabled: true
+
+# Disable external databases  
+externalDatabase:
+  enabled: false
+  
+externalRedis:
+  enabled: false
+
+autoscaling:
+  enabled: false  # Disable HPA in dev

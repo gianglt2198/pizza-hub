@@ -1,0 +1,97 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "pizza-hub.fullname" . }}
+  labels:
+    {{- include "pizza-hub.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.app.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "pizza-hub.selectorLabels" . | nindent 6 }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        {{- include "pizza-hub.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "pizza-hub.serviceAccountName" . }}
+      containers:
+        - name: {{ .Values.app.name }}
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.app.image.repository }}:{{ .Values.app.image.tag }}"
+          imagePullPolicy: {{ .Values.app.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.app.service.targetPort }}
+              protocol: TCP
+          env:
+            - name: ENV
+              value: {{ .Values.app.env.ENV | quote }}
+            - name: SERVER_PORT  
+              value: {{ .Values.app.env.SERVER_PORT | quote }}
+            {{- if .Values.externalDatabase.enabled }}
+            - name: DATABASE__HOST
+              value: {{ .Values.externalDatabase.host | quote }}
+            - name: DATABASE__PORT
+              value: {{ .Values.externalDatabase.port | quote }}
+            - name: DATABASE__SSL_MODE
+              value: {{ .Values.externalDatabase.sslMode | quote }}
+            {{- else }}
+            - name: DATABASE__HOST
+              value: "{{ include "pizza-hub.fullname" . }}-postgresql"
+            - name: DATABASE__PORT
+              value: "5432"
+            - name: DATABASE__SSL_MODE
+              value: "disable"
+            {{- end }}
+            {{- if .Values.externalRedis.enabled }}
+            - name: REDIS__HOST
+              value: {{ .Values.externalRedis.host | quote }}
+            - name: REDIS__PORT
+              value: {{ .Values.externalRedis.port | quote }}
+            {{- else }}
+            - name: REDIS__HOST
+              value: "{{ include "pizza-hub.fullname" . }}-redis-master"
+            - name: REDIS__PORT
+              value: "6379"
+            {{- end }}
+            # Database credentials từ Secret
+            - name: DATABASE__USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "pizza-hub.fullname" . }}-secret
+                  key: db-user
+            - name: DATABASE__PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "pizza-hub.fullname" . }}-secret
+                  key: db-password
+            - name: DATABASE__NAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "pizza-hub.fullname" . }}-secret
+                  key: db-name
+          {{- with .Values.app.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.app.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.app.resources | nindent 12 }}

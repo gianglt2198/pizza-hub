@@ -1,0 +1,50 @@
+# Production environment overrides
+app:
+  image:
+    tag: "v1.0.0"  # Stable tag
+  replicaCount: 3
+  
+  env:
+    ENV: "production"
+    
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "500m"
+
+# Disable in-cluster databases for production
+postgresql:
+  enabled: false
+  
+redis:
+  enabled: false
+
+# Use external managed databases
+externalDatabase:
+  enabled: true
+  host: "pizza-hub-prod.cluster-xxxxx.us-west-2.rds.amazonaws.com"
+  port: 5432
+  username: pizza
+  database: pizzahub
+  sslMode: required
+  
+externalRedis:
+  enabled: true
+  host: "pizza-hub-prod.xxxxx.cache.amazonaws.com"
+  port: 6379
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+  
+ingress:
+  enabled: true
+  hosts:
+    - host: pizza.yourdomain.com
+      paths:
+        - path: /
+          pathType: Prefix

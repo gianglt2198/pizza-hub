@@ -1,0 +1,137 @@
+# Global settings 
+global:
+  imageRegistry: ""
+  storageClass: ""
+
+# Application settings
+app:
+  name: pizza-app
+  image:
+    repository: gianglt1/pizza-hub-app
+    tag: "v1.0.0"
+    pullPolicy: IfNotPresent
+  
+  replicas: 2
+
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 8080
+  
+  resources:  
+    requests:  
+      memory: "64Mi"  
+      cpu: "50m"  
+    limits:  
+      memory: "128Mi"   
+      cpu: "200m"
+  
+  # Environment variables  
+  env:  
+    ENV: "production"  
+    SERVER_PORT: "8080"  
+
+  # Health checks  
+  livenessProbe:  
+    httpGet:  
+      path: /health  
+      port: 8080  
+    initialDelaySeconds: 10  
+    periodSeconds: 15  
+    
+  readinessProbe:  
+    httpGet:  
+      path: /health  
+      port: 8080  
+    initialDelaySeconds: 5  
+    periodSeconds: 10  
+
+# HPA Configuration    
+autoscaling:  
+  enabled: true  
+  minReplicas: 2  
+  maxReplicas: 6  
+  targetCPUUtilizationPercentage: 60  
+
+# PostgreSQL configuration (in-cluster)  
+postgresql:  
+  enabled: true  
+  image:  
+    repository: postgres  
+    tag: "16-alpine"  
+  auth:  
+    username: pizza  
+    password: pizza123  
+    database: pizzahub  
+  persistence:  
+    size: 1Gi  
+  resources:  
+    requests:  
+      memory: "128Mi"  
+      cpu: "100m"  
+    limits:  
+      memory: "256Mi"  
+      cpu: "300m"  
+
+# Redis configuration (in-cluster)  
+redis:  
+  enabled: true  
+  image:  
+    repository: redis  
+    tag: "7-alpine"  
+  persistence:  
+    enabled: false  
+  resources:  
+    requests:  
+      memory: "64Mi"  
+      cpu: "50m"  
+    limits:  
+      memory: "128Mi"  
+      cpu: "100m"  
+
+
+# External database configuration (for production)  
+externalDatabase:  
+  enabled: false  
+  host: ""  
+  port: 5432  
+  username: pizza  
+  database: pizzahub  
+  sslMode: require  
+
+externalRedis:  
+  enabled: false  
+  host: ""  
+  port: 6379  
+
+# Ingress configuration  
+ingress:  
+  enabled: false  
+  className: "alb"  
+  annotations:  
+    kubernetes.io/ingress.class: alb  
+    alb.ingress.kubernetes.io/scheme: internet-facing  
+  hosts:  
+    - host: pizza.local  
+      paths:  
+        - path: /  
+          pathType: Prefix  
+  tls: []  
+
+# Security  
+podSecurityContext:  
+  fsGroup: 2000  
+
+securityContext:  
+  capabilities:  
+    drop:  
+    - ALL  
+  readOnlyRootFilesystem: true  
+  runAsNonRoot: true  
+  runAsUser: 1000  
+
+# Service Account  
+serviceAccount:  
+  create: true  
+  annotations: {}  
+  name: ""  
