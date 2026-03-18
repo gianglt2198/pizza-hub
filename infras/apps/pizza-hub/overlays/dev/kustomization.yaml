@@ -7,8 +7,16 @@ resources:
 namespace: pizza-hub
 
 patches:
-- path: patches/app-replicas.yaml
-- path: patches/resources-limit.yaml
+- target:
+    kind: Deployment
+    name: pizza-app
+    version: v1
+  path: patches/app-replicas.yaml
+- target:
+    kind: Deployment
+    name: pizza-app
+    version: v1
+  path: patches/resources-limit.yaml
 
 configMapGenerator:
 - behavior: merge
