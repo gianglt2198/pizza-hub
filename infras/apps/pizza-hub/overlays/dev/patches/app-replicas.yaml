@@ -3,4 +3,4 @@ kind: Deployment
 metadata:
   name: pizza-app
 spec:
-  replicas: 1  # Single replica for dev
+  replicas: 0  # Single replica for dev
