@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pizza-config
+  namespace: pizza-hub
+data:
+  APP__SERVER_PORT: "8080"
+  ENV: "production"
+  DATABASE__HOST: "postgres-svc"
+  DATABASE__PORT: "5432"
+  DATABASE__SSL_MODE: disable
+  REDIS__HOST: "redis-svc"
+  REDIS__PORT: "6379"

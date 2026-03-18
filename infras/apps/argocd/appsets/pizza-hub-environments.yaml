@@ -6,8 +6,6 @@ metadata:
   namespace: argocd
 
 spec:
-  goTemplate: true
-  goTemplateOptions: ["missingkey=error"]
   generators:
     - git:
         repoURL: 'https://github.com/gianglt2198/pizza-hub.git'
