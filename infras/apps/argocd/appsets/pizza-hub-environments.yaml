@@ -11,7 +11,7 @@ spec:
         repoURL: 'https://github.com/gianglt2198/pizza-hub.git'
         revision: HEAD
         directories:
-          - path: infras/apps/pizza-hub/overlays/*
+          - path: infras/apps/pizza-hub-kustomize/overlays/*
     ###### Example of list generator for multiple environments (uncomment and adjust as needed) ######
     # - list:
     #     elements:
