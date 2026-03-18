@@ -2,8 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: pizza-app
-  labels:
-    app: pizza-app
 spec:
   template:
     spec:
