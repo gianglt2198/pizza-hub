@@ -8,7 +8,7 @@ namespace: pizza-hub
 
 patches:
 - path: patches/app-replicas.yaml
-- path: patches/resources-limits.yaml
+- path: patches/resources-limit.yaml
 
 configMapGenerator:
 - behavior: merge
