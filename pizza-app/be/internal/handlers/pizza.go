@@ -39,7 +39,7 @@ func (h *PizzaHandler) List(c *gin.Context) {
 		return
 	}
 
-	h.cache.Set(ctx, cacheKey, pizzas, 5*time.Minute)
+	_ = h.cache.Set(ctx, cacheKey, pizzas, 5*time.Minute)
 	c.Header("X-Cache", "MISS")
 	c.JSON(http.StatusOK, pizzas)
 }
@@ -71,7 +71,7 @@ func (h *PizzaHandler) GetByID(c *gin.Context) {
 		return
 	}
 
-	h.cache.Set(ctx, cacheKey, p, 5*time.Minute)
+	_ = h.cache.Set(ctx, cacheKey, p, 5*time.Minute)
 	c.Header("X-Cache", "MISS")
 	c.JSON(http.StatusOK, p)
 }
@@ -93,7 +93,7 @@ func (h *PizzaHandler) ListAvailable(c *gin.Context) {
 		return
 	}
 
-	h.cache.Set(ctx, cacheKey, pizzas, 5*time.Minute)
+	_ = h.cache.Set(ctx, cacheKey, pizzas, 5*time.Minute)
 	c.Header("X-Cache", "MISS")
 	c.JSON(http.StatusOK, pizzas)
 }

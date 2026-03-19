@@ -21,7 +21,7 @@ func (r *OrderRepository) Create(ctx context.Context, req model.CreateOrderReque
 	if err != nil {
 		return nil, err
 	}
-	defer tx.Rollback(ctx)
+	defer func() { _ = tx.Rollback(ctx) }()
 
 	var order model.Order
 	err = tx.QueryRow(ctx, `
