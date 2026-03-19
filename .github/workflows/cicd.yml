@@ -1,0 +1,164 @@
+name: Pizza Hub CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, dev]
+    paths:
+      - 'pizza-app/**'
+      - '.github/workflows/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'pizza-app/**'
+  
+env:
+  REGISTRY: docker.io
+  IMAGE_NAME: gianglt1/pizza-hub-app
+  GO_VERSION: '1.25'
+
+jobs:
+  # Stage 1: Code Quality and Testing
+  lint-and-test:
+    name: Lint & Test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./pizza-app/be
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ env.GO_VERSION }}
+      
+      - name: Cache go modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{hashFiles('**/go.sum')}}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      
+      - name: Install dependencies
+        run: go mod download
+
+      - name: Run linters
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: latest
+          working-directory: ./pizza-app/be
+          args: --timeout=10m
+        
+      - name: Run tests with coverage
+        run: |
+          go test ./... -race -coverprofile=coverage.out -covermode=atomic
+          go tool cover -html=coverage.out -o coverage.html
+      
+      - name: Upload coverage report
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./pizza-app/be/coverage.out
+          fail_ci_if_error: true
+
+  # Stage 2: Build and Security Scan
+  build-and-scan:
+    name: Build & Security Scan
+    runs-on: ubuntu-latest
+    needs: lint-and-test
+    outputs:
+      image-digest: ${{ steps.build.outputs.digest }}
+      image-tag: ${{ steps.build.outputs.tag }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Log into Docker Hub
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+        
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE_NAME }}
+          tags: | 
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push Docker Image
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: ./pizza-app/be
+          file: ./pizza-app/be/Dockerfile
+          platforms: linux/adm64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # 🚀 Stage 3: Deploy to environments  
+  deploy-dev:  
+    name: Deploy to Development  
+    runs-on: ubuntu-latest  
+    needs: build-and-scan  
+    if: github.ref == 'refs/heads/develop'  
+    environment: development  
+    
+    steps:  
+      - name: Checkout code  
+        uses: actions/checkout@v4  
+
+      - name: Update image tag in Kustomize  
+        run: |  
+          cd infras/apps/pizza-hub-kustomize/overlays/dev  
+          # Update image tag in kustomization.yaml  
+          yq eval '.images[0].newTag = "${{ github.sha }}"' -i kustomization.yaml  
+          
+      - name: Commit and push changes  
+        run: |  
+          git config --local user.email "action@github.com"  
+          git config --local user.name "GitHub Action"  
+          git add infras/apps/pizza-hub-kustomize/overlays/dev/kustomization.yaml  
+          git commit -m "Update dev image to ${{ github.sha }}" || exit 0  
+          git push  
+
+  deploy-prod:  
+    name: Deploy to Production  
+    runs-on: ubuntu-latest  
+    needs: build-and-scan  
+    if: github.ref == 'refs/heads/main'  
+    environment: production  
+    
+    steps:  
+      - name: Checkout code  
+        uses: actions/checkout@v4  
+
+      - name: Update image tag in Kustomize  
+        run: |  
+          cd infras/apps/pizza-hub-kustomize/overlays/prod  
+          yq eval '.images[0].newTag = "${{ github.sha }}"' -i kustomization.yaml  
+          
+      - name: Commit and push changes  
+        run: |  
+          git config --local user.email "action@github.com"  
+          git config --local user.name "GitHub Action"  
+          git add infras/apps/pizza-hub-kustomize/overlays/prod/kustomization.yaml  
+          git commit -m "Update prod image to ${{ github.sha }}" || exit 0  
+          git push  
+

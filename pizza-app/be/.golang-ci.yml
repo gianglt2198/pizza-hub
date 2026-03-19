@@ -1,0 +1,22 @@
+linters-settings:
+  govet:
+    check-shadowing: true
+  golint:
+    min-confidence: 0.8
+  gocyclo:
+    min-complexity: 15
+  maligned:
+    suggest-new: true
+  dupl:
+    threshold: 100
+
+linters:
+  enable:
+    - megacheck  
+    - govet  
+    - gocyclo  
+    - misspell  
+    - gocritic  
+  disable:  
+    - maligned  
+    - prealloc  
