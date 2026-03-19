@@ -8,7 +8,7 @@ spec:
   source: 
     repoURL: 'https://github.com/gianglt2198/pizza-hub.git'
     targetRevision: HEAD
-    path: infras/apps/argocd/appsets
+    path: infras/apps/argocd/appsets/helm
 
   destination:
     server: 'https://kubernetes.default.svc'
