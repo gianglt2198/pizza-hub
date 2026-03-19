@@ -59,11 +59,11 @@ jobs:
           go test ./... -race -coverprofile=coverage.out -covermode=atomic
           go tool cover -html=coverage.out -o coverage.html
       
-      - name: Upload coverage report
-        uses: codecov/codecov-action@v5
-        with:
-          files: ./pizza-app/be/coverage.out
-          fail_ci_if_error: true
+      # - name: Upload coverage report
+      #   uses: codecov/codecov-action@v5
+      #   with:
+      #     files: ./pizza-app/be/coverage.out
+      #     fail_ci_if_error: true
 
   # Stage 2: Build and Security Scan
   build-and-scan:
