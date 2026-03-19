@@ -11,7 +11,7 @@ app:
     tag: "v1.0.0"
     pullPolicy: IfNotPresent
   
-  replicas: 2
+  replicas: 1
 
   service:
     type: ClusterIP
@@ -48,22 +48,29 @@ app:
 
 # HPA Configuration    
 autoscaling:  
-  enabled: true  
-  minReplicas: 2  
+  enabled: false  
+  minReplicas: 1 
   maxReplicas: 6  
   targetCPUUtilizationPercentage: 60  
 
 # PostgreSQL configuration (in-cluster)  
 postgresql:  
   enabled: true  
+  name: postgres
   image:  
     repository: postgres  
-    tag: "16-alpine"  
+    tag: "18-alpine"  
+    pullPolicy: IfNotPresent  
   auth:  
     username: pizza  
     password: pizza123  
     database: pizzahub  
+  service:  
+    type: ClusterIP  
+    port: 5432  
   persistence:  
+    enabled: true  
+    storageClass: ""  
     size: 1Gi  
   resources:  
     requests:  
@@ -71,16 +78,29 @@ postgresql:
       cpu: "100m"  
     limits:  
       memory: "256Mi"  
-      cpu: "300m"  
+      cpu: "300m"
+  # Health checks  
+  readinessProbe:  
+    exec:  
+      command: ['pg_isready', '-U', 'pizza', '-d', 'pizzahub']  
+    initialDelaySeconds: 5  
+    periodSeconds: 5    
 
 # Redis configuration (in-cluster)  
 redis:  
-  enabled: true  
+  enabled: true 
+  name: redis  
   image:  
     repository: redis  
     tag: "7-alpine"  
+    pullPolicy: IfNotPresent  
+  service:  
+    type: ClusterIP  
+    port: 6379  
   persistence:  
-    enabled: false  
+    enabled: true  
+    storageClass: ""  
+    size: 1Gi    
   resources:  
     requests:  
       memory: "64Mi"  
@@ -88,7 +108,13 @@ redis:
     limits:  
       memory: "128Mi"  
       cpu: "100m"  
-
+      
+  # Health checks  
+  readinessProbe:  
+    exec:  
+      command: ["redis-cli", "ping"]  
+    initialDelaySeconds: 3  
+    periodSeconds: 5  
 
 # External database configuration (for production)  
 externalDatabase:  
@@ -126,12 +152,11 @@ securityContext:
   capabilities:  
     drop:  
     - ALL  
-  readOnlyRootFilesystem: true  
   runAsNonRoot: true  
   runAsUser: 1000  
 
 # Service Account  
 serviceAccount:  
-  create: true  
+  create: false  
   annotations: {}  
   name: ""  

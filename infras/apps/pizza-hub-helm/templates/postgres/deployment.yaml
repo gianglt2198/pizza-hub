@@ -1,60 +1,80 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: postgres
-  namespace: pizza-hub
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: postgres
-  template:
-    metadata:
-      labels:
-        app: postgres
-    spec:
-      containers:
-        - name: postgres
-          image: postgres:16-alpine
-          ports:
-            - containerPort: 5432
-          env:
-            - name: POSTGRES_USER
-              valueFrom:
-                secretKeyRef:
-                  name: pizza-secrets
-                  key: db-user
-            - name: POSTGRES_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: pizza-secrets
-                  key: db-password
-            - name: POSTGRES_DB
-              valueFrom:
-                secretKeyRef:
-                  name: pizza-secrets
-                  key: db-name
-          volumeMounts:
-            - name: postgres-storage
-              mountPath: /var/lib/postgresql/data
-            - name: init-sql
-              mountPath: /docker-entrypoint-initdb.d
-          resources:
-            requests:
-              memory: "128Mi"
-              cpu: "100m"
-            limits:
-              memory: "256Mi"
-              cpu: "300m"
-          readinessProbe:
-            exec: 
-              command: ["pg_isready", "-U", "pizza", "-d", "pizzahub"]
-            initialDelaySeconds: 5 
-            periodSeconds: 5
-      volumes:
-        - name: postgres-storage 
-          persistentVolumeClaim: 
-            claimName: postgres-pvc 
-        - name: init-sql 
-          configMap: 
-            name: postgres-init-sql
+{{- if .Values.postgresql.enabled }}  
+apiVersion: apps/v1  
+kind: Deployment  
+metadata:  
+  name: {{ include "pizza-hub.postgresql.name" . }}  
+  namespace: {{ .Release.Namespace }}  
+  labels:  
+    {{- include "pizza-hub.postgresql.labels" . | nindent 4 }}  
+spec:  
+  replicas: 1  
+  strategy:  
+    type: RollingUpdate  
+  selector:  
+    matchLabels:  
+      {{- include "pizza-hub.postgresql.selectorLabels" . | nindent 6 }}  
+  template:  
+    metadata:  
+      labels:  
+        {{- include "pizza-hub.postgresql.selectorLabels" . | nindent 8 }}  
+    spec:  
+      {{- with .Values.podSecurityContext }}  
+      securityContext:  
+        {{- toYaml . | nindent 8 }}  
+      {{- end }}  
+      containers:  
+        - name: {{ .Values.postgresql.name }}  
+          {{- with .Values.securityContext }}  
+          securityContext:  
+            {{- toYaml . | nindent 12 }}  
+          {{- end }}  
+          image: "{{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}"  
+          imagePullPolicy: {{ .Values.postgresql.image.pullPolicy }}  
+          ports:  
+            - name: postgresql  
+              containerPort: {{ .Values.postgresql.service.port }}  
+              protocol: TCP  
+          env:  
+            - name: POSTGRES_USER  
+              valueFrom:  
+                secretKeyRef:  
+                  name: {{ include "pizza-hub.fullname" . }}-secret  
+                  key: db-user  
+            - name: POSTGRES_PASSWORD  
+              valueFrom:  
+                secretKeyRef:  
+                  name: {{ include "pizza-hub.fullname" . }}-secret  
+                  key: db-password  
+            - name: POSTGRES_DB  
+              valueFrom:  
+                secretKeyRef:  
+                  name: {{ include "pizza-hub.fullname" . }}-secret  
+                  key: db-name  
+            - name: PGDATA  
+              value: /var/lib/postgresql/data/pgdata
+          {{- with .Values.postgresql.readinessProbe }}  
+          readinessProbe:  
+            {{- toYaml . | nindent 12 }}  
+          {{- end }}  
+          resources:  
+            {{- toYaml .Values.postgresql.resources | nindent 12 }}  
+          volumeMounts:  
+            {{- if .Values.postgresql.persistence.enabled }}  
+            - name: postgresql-storage  
+              mountPath: /var/lib/postgresql/data  
+            {{- end }}  
+            - name: init-sql  
+              mountPath: /docker-entrypoint-initdb.d  
+      volumes:  
+        {{- if .Values.postgresql.persistence.enabled }}  
+        - name: postgresql-storage  
+          persistentVolumeClaim:  
+            claimName: {{ include "pizza-hub.postgresql.name" . }}-pvc  
+        {{- else }}  
+        - name: postgresql-storage  
+          emptyDir: {}  
+        {{- end }}  
+        - name: init-sql  
+          configMap:  
+            name: {{ include "pizza-hub.postgresql.name" . }}-init-sql  
+{{- end }}  

@@ -1,0 +1,57 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+
+metadata:
+  name: pizza-hub-helm-environments
+  namespace: argocd
+
+spec:
+  generators:
+    ###### Example of git generator for multiple environments (uncomment and adjust as needed) ######
+    # - git:
+    #     repoURL: 'https://github.com/gianglt2198/pizza-hub.git'
+    #     revision: HEAD
+    #     directories:
+    #       - path: infras/apps/pizza-hub-helm/*
+    - list:
+        elements:
+        - env: dev
+          valueFile: values.dev.yaml
+          namespace: pizza-hub-dev
+        - env: prod
+          valueFile: values.prod.yaml
+          namespace: pizza-hub-prod
+
+  template:
+    metadata:
+      name: 'pizza-hub-{{env}}'
+      labels:
+        environment: '{{env}}'
+        deployment-method: helm
+    spec:
+      project: default
+      source:
+        repoURL: 'https://github.com/gianglt2198/pizza-hub.git'
+        targetRevision: 'HEAD'
+        path: infras/apps/pizza-hub-helm
+        helm:
+          valueFiles:
+          - '{{valueFile}}'
+
+      destination:
+        server: 'https://kubernetes.default.svc'
+        namespace: '{{namespace}}'
+
+      # Sync policy
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+        retry:
+          limit: 5
+          backoff:
+            duration: "5s"
+            factor: 2
+            maxDuration: "3m"

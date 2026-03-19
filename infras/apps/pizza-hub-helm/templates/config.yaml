@@ -1,8 +1,9 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: pizza-app-config-file
-  namespace: pizza-hub
+  name: {{ include "pizza-hub.fullname" . }}-config-file
+  labels:
+    {{- include "pizza-hub.labels" . | nindent 4 }}
 data:
   config.yaml: |
     app:

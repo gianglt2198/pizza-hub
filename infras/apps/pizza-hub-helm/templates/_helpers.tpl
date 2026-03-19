@@ -58,3 +58,59 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}  
 {{- end }}  
 {{- end }}  
+
+{{/*
+PostgreSQL name
+*/}}
+{{- define "pizza-hub.postgresql.name" -}}
+{{- printf "%s-%s" (include "pizza-hub.fullname" .) .Values.postgresql.name }}
+{{- end }}
+
+{{/*
+Redis name
+*/}}
+{{- define "pizza-hub.redis.name" -}}
+{{- printf "%s-%s" (include "pizza-hub.fullname" .) .Values.redis.name }}
+{{- end }}
+
+{{/*
+PostgreSQL labels
+*/}}
+{{- define "pizza-hub.postgresql.labels" -}}
+helm.sh/chart: {{ include "pizza-hub.chart" . }}
+{{ include "pizza-hub.postgresql.selectorLabels" . }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+app.kubernetes.io/component: database
+{{- end }}
+
+{{/*
+PostgreSQL selector labels
+*/}}
+{{- define "pizza-hub.postgresql.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "pizza-hub.name" . }}-postgresql
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
+
+{{/*
+Redis labels
+*/}}
+{{- define "pizza-hub.redis.labels" -}}
+helm.sh/chart: {{ include "pizza-hub.chart" . }}
+{{ include "pizza-hub.redis.selectorLabels" . }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+app.kubernetes.io/component: cache
+{{- end }}
+
+{{/*
+Redis selector labels
+*/}}
+{{- define "pizza-hub.redis.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "pizza-hub.name" . }}-redis
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}

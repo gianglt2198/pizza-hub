@@ -1,12 +1,18 @@
+{{- if .Values.redis.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: redis-svc
-  namespace: pizza-hub
+  name: {{ include "pizza-hub.redis.name" . }}-svc
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "pizza-hub.redis.labels" . | nindent 4 }}
 spec:
-  selector:
-    app: redis
+  type: {{ .Values.redis.service.type }}
   ports:
-    - port: 6379
-      targetPort: 6379
-  type: ClusterIP
+    - port: {{ .Values.redis.service.port }}
+      targetPort: redis
+      protocol: TCP
+      name: redis
+  selector:
+    {{- include "pizza-hub.redis.selectorLabels" . | nindent 4 }}
+{{- end }}

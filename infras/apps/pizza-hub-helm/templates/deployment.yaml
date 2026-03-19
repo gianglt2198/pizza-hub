@@ -6,7 +6,7 @@ metadata:
     {{- include "pizza-hub.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
-  replicas: {{ .Values.app.replicaCount }}
+  replicas: {{ .Values.app.replicas }}
   {{- end }}
   selector:
     matchLabels:
@@ -15,7 +15,6 @@ spec:
     type: RollingUpdate
     rollingUpdate:
       maxSurge: 1
-      maxUnavailable: 0
   template:
     metadata:
       labels:
@@ -25,7 +24,9 @@ spec:
       securityContext:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- if .Values.serviceAccount.create }}  
       serviceAccountName: {{ include "pizza-hub.serviceAccountName" . }}
+      {{- end }}
       containers:
         - name: {{ .Values.app.name }}
           {{- with .Values.securityContext }}
@@ -35,9 +36,7 @@ spec:
           image: "{{ .Values.app.image.repository }}:{{ .Values.app.image.tag }}"
           imagePullPolicy: {{ .Values.app.image.pullPolicy }}
           ports:
-            - name: http
-              containerPort: {{ .Values.app.service.targetPort }}
-              protocol: TCP
+            - containerPort: {{ .Values.app.service.targetPort }}
           env:
             - name: ENV
               value: {{ .Values.app.env.ENV | quote }}
@@ -52,7 +51,7 @@ spec:
               value: {{ .Values.externalDatabase.sslMode | quote }}
             {{- else }}
             - name: DATABASE__HOST
-              value: "{{ include "pizza-hub.fullname" . }}-postgresql"
+              value: "{{ include "pizza-hub.postgresql.name" . }}-svc"
             - name: DATABASE__PORT
               value: "5432"
             - name: DATABASE__SSL_MODE
@@ -65,7 +64,7 @@ spec:
               value: {{ .Values.externalRedis.port | quote }}
             {{- else }}
             - name: REDIS__HOST
-              value: "{{ include "pizza-hub.fullname" . }}-redis-master"
+              value: "{{ include "pizza-hub.redis.name" . }}-svc"
             - name: REDIS__PORT
               value: "6379"
             {{- end }}
@@ -85,6 +84,10 @@ spec:
                 secretKeyRef:
                   name: {{ include "pizza-hub.fullname" . }}-secret
                   key: db-name
+          volumeMounts:
+            - name: app-config
+              mountPath: /app/config
+              readOnly: true
           {{- with .Values.app.livenessProbe }}
           livenessProbe:
             {{- toYaml . | nindent 12 }}
@@ -95,3 +98,7 @@ spec:
           {{- end }}
           resources:
             {{- toYaml .Values.app.resources | nindent 12 }}
+      volumes:
+        - name: app-config
+          configMap:
+            name: {{ include "pizza-hub.fullname" . }}-config-file

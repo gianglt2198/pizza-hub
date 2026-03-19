@@ -37,14 +37,3 @@ sources:
 maintainers:
   - name: gianglt2198
     email: giangle2198@gmail.com
-
-dependencies:  
-  - name: postgresql  
-    version: "18.5.7"  
-    repository: "https://charts.bitnami.com/bitnami"  
-    condition: postgresql.enabled
-    
-  - name: redis  
-    version: "25.3.5"  
-    repository: "https://charts.bitnami.com/bitnami"  
-    condition: redis.enabled

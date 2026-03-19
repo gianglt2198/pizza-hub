@@ -1,8 +1,11 @@
+{{- if .Values.postgresql.enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: postgres-init-sql
-  namespace: pizza-hub
+  name: {{ include "pizza-hub.postgresql.name" . }}-init-sql
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "pizza-hub.postgresql.labels" . | nindent 4 }}
 data:
   init.sql: | 
     CREATE TABLE IF NOT EXISTS pizzas (
@@ -40,3 +43,4 @@ data:
         ('Truffle Shroom', 'Truffle oil, mushrooms, parmesan, arugula',      14.99, 'premium'),
         ('Garden Veggie',  'Tomato sauce, bell peppers, olives, mushrooms',   9.99, 'veggie'),
         ('Vegan Delight',  'Cashew cheese, roasted veggies, pesto',          11.99, 'veggie') ON CONFLICT DO NOTHING;
+{{- end }}

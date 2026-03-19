@@ -1,12 +1,18 @@
+{{- if .Values.postgresql.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: postgres-svc
-  namespace: pizza-hub
+  name: {{ include "pizza-hub.postgresql.name" . }}-svc
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "pizza-hub.postgresql.labels" . | nindent 4 }}
 spec:
-  selector:
-    app: postgres
+  type: {{ .Values.postgresql.service.type }}
   ports:
-    - port: 5432
-      targetPort: 5432
-  type: ClusterIP
+    - port: {{ .Values.postgresql.service.port }}
+      targetPort: postgresql
+      protocol: TCP
+      name: postgresql
+  selector:
+    {{- include "pizza-hub.postgresql.selectorLabels" . | nindent 4 }}
+{{- end }}
