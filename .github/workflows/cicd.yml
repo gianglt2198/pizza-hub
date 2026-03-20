@@ -121,15 +121,15 @@ jobs:
     environment: dev
     
     steps:  
-      - uses: actions/create-github-app-token@v3
-        id: app-token
-        with:
-          # required
-          app-id: ${{ vars.APP_ID }}
-          private-key: ${{ secrets.APP_PRIVATE_KEY }}
-          owner: ${{ github.repository_owner }}
-          repositories: |
-            pizza-hub
+      # - uses: actions/create-github-app-token@v3
+      #   id: app-token
+      #   with:
+      #     # required
+      #     app-id: ${{ vars.APP_ID }}
+      #     private-key: ${{ secrets.APP_PRIVATE_KEY }}
+      #     owner: ${{ github.repository_owner }}
+      #     repositories: |
+      #       pizza-hub
 
       - name: Checkout code  
         uses: actions/checkout@v6  
@@ -140,25 +140,30 @@ jobs:
           # Update image tag in kustomization.yaml  
           yq eval '.images[0].newTag = "${{ github.sha }}"' -i kustomization.yaml
 
-      - name: Get GitHub App User ID
-        id: get-user-id
-        run: echo "user-id=$(gh api "/users/${{ steps.app-token.outputs.app-slug }}[bot]" --jq .id)" >> "$GITHUB_OUTPUT"
-        env:
-          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+      # - name: Get GitHub App User ID
+      #   id: get-user-id
+      #   run: echo "user-id=$(gh api "/users/${{ steps.app-token.outputs.app-slug }}[bot]" --jq .id)" >> "$GITHUB_OUTPUT"
+      #   env:
+      #     GH_TOKEN: ${{ steps.app-token.outputs.token }}
 
+      # - name: Configure Git for committing changes
+      #   run: |
+      #       git config --global user.name '${{ steps.app-token.outputs.app-slug }}[bot]'
+      #       git config --global user.email '${{ steps.get-user-id.outputs.user-id }}+${{ steps.app-token.outputs.app-slug }}[bot]@users.noreply.github.com'
+      
       - name: Configure Git for committing changes
         run: |
-            git config --global user.name '${{ steps.app-token.outputs.app-slug }}[bot]'
-            git config --global user.email '${{ steps.get-user-id.outputs.user-id }}+${{ steps.app-token.outputs.app-slug }}[bot]@users.noreply.github.com'
-     
+          echo "Configuring Git..."
+          echo ${{ github.repository }}
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git remote set-url origin https://x-access-token:${{ secrets.PAT }}@github.com/${{ github.repository }}
+
       - name: Commit and push changes  
         run: |  
           git add infras/apps/pizza-hub-kustomize/overlays/dev/kustomization.yaml  
           git commit -m "Update dev image to ${{ github.sha }}" || exit 0  
           git push
-        env:
-          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
-          GH_TOKEN: ${{ steps.app-token.outputs.token }}
 
   # deploy-prod:  
   #   name: Deploy to Production  
