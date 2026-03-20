@@ -155,11 +155,9 @@ jobs:
         run: |  
           git add infras/apps/pizza-hub-kustomize/overlays/dev/kustomization.yaml  
           git commit -m "Update dev image to ${{ github.sha }}" || exit 0  
-          git push  
-        with: 
-          token: ${{ steps.app-token.outputs.token }}
+          git push
         env:
-          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
 
   # deploy-prod:  
   #   name: Deploy to Production  
