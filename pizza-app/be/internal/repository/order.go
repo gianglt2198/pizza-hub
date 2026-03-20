@@ -8,11 +8,18 @@ import (
 	"github.com/gianglt2198/pizza-app/internal/model"
 )
 
+type OrderRepo interface {
+	Create(ctx context.Context, req model.CreateOrderRequest, totalPrice float64) (*model.Order, error)
+	FindAll(ctx context.Context) ([]model.Order, error)
+	FindByID(ctx context.Context, id int) (*model.Order, error)
+	UpdateStatus(ctx context.Context, id int, status model.OrderStatus) (*model.Order, error)
+}
+
 type OrderRepository struct {
 	db *pgxpool.Pool
 }
 
-func NewOrderRepository(db *pgxpool.Pool) *OrderRepository {
+func NewOrderRepository(db *pgxpool.Pool) OrderRepo {
 	return &OrderRepository{db: db}
 }
 

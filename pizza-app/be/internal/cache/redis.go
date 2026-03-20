@@ -8,6 +8,13 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
+type CacheStore interface {
+	Ping(ctx context.Context) error
+	Get(ctx context.Context, key string, dest any) error
+	Set(ctx context.Context, key string, value any, ttl time.Duration) error
+	Delete(ctx context.Context, keys ...string) error
+}
+
 type RedisCache struct {
 	client *redis.Client
 }

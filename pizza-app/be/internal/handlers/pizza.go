@@ -14,11 +14,11 @@ import (
 )
 
 type PizzaHandler struct {
-	repo  *repository.PizzaRepository
-	cache *cache.RedisCache
+	repo  repository.PizzaRepo
+	cache cache.CacheStore
 }
 
-func NewPizzaHandler(repo *repository.PizzaRepository, cache *cache.RedisCache) *PizzaHandler {
+func NewPizzaHandler(repo repository.PizzaRepo, cache cache.CacheStore) *PizzaHandler {
 	return &PizzaHandler{repo: repo, cache: cache}
 }
 

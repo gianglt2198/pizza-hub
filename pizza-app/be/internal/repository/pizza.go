@@ -8,6 +8,12 @@ import (
 	"github.com/gianglt2198/pizza-app/internal/model"
 )
 
+type PizzaRepo interface {
+	FindAll(ctx context.Context) ([]model.Pizza, error)
+	FindAvailable(ctx context.Context) ([]model.Pizza, error)
+	FindByID(ctx context.Context, id int) (*model.Pizza, error)
+}
+
 type PizzaRepository struct {
 	db *pgxpool.Pool
 }

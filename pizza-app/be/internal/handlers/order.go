@@ -13,15 +13,15 @@ import (
 )
 
 type OrderHandler struct {
-	orderRepo *repository.OrderRepository
-	pizzaRepo *repository.PizzaRepository
-	cache     *cache.RedisCache
+	orderRepo repository.OrderRepo
+	pizzaRepo repository.PizzaRepo
+	cache     cache.CacheStore
 }
 
 func NewOrderHandler(
-	orderRepo *repository.OrderRepository,
-	pizzaRepo *repository.PizzaRepository,
-	cache *cache.RedisCache,
+	orderRepo repository.OrderRepo,
+	pizzaRepo repository.PizzaRepo,
+	cache cache.CacheStore,
 ) *OrderHandler {
 	return &OrderHandler{orderRepo: orderRepo, pizzaRepo: pizzaRepo, cache: cache}
 }

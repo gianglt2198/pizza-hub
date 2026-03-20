@@ -3,16 +3,15 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/gin-gonic/gin"
-
 	"github.com/gianglt2198/pizza-app/internal/cache"
+	"github.com/gin-gonic/gin"
 )
 
 type HealthHandler struct {
-	cache *cache.RedisCache
+	cache cache.CacheStore
 }
 
-func NewHealthHandler(cache *cache.RedisCache) *HealthHandler {
+func NewHealthHandler(cache cache.CacheStore) *HealthHandler {
 	return &HealthHandler{cache: cache}
 }
 
