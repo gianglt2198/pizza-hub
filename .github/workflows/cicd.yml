@@ -127,6 +127,9 @@ jobs:
           # required
           app-id: ${{ vars.APP_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: |
+            https://github.com/gianglt2198/pizza-hub
 
       - name: Checkout code  
         uses: actions/checkout@v6  
