@@ -24,4 +24,4 @@ configMapGenerator:
 images:
   - name: pizza-app
     newName: gianglt1/pizza-hub-app
-    newTag: 6b81c899fe199a4e481f682b760db2df7a4e5535
+    newTag: 89f01d7c963f8efb2d86d5e9d1feba1b69cbc164
