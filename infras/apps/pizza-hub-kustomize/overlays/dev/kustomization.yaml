@@ -1,32 +1,27 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-
 resources:
-- ../../base
-
+  - ../../base
 namespace: pizza-hub
-
 patches:
-- target:
-    kind: Deployment
-    name: pizza-app
-    version: v1
-  path: patches/app-replicas.yaml
-- target:
-    kind: Deployment
-    name: pizza-app
-    version: v1
-  path: patches/resources-limit.yaml
-
+  - target:
+      kind: Deployment
+      name: pizza-app
+      version: v1
+    path: patches/app-replicas.yaml
+  - target:
+      kind: Deployment
+      name: pizza-app
+      version: v1
+    path: patches/resources-limit.yaml
 configMapGenerator:
-- behavior: merge
-  literals:
-  - ENV=dev
-  - DB_HOST=postgres-svc
-  - REDIS_HOST=redis-svc
-  name: pizza-config
-
+  - behavior: merge
+    literals:
+      - ENV=dev
+      - DB_HOST=postgres-svc
+      - REDIS_HOST=redis-svc
+    name: pizza-config
 images:
-- name: pizza-app
-  newName: gianglt1/pizza-hub-app
-  newTag: dev-latest
+  - name: pizza-app
+    newName: gianglt1/pizza-hub-app
+    newTag: 6b81c899fe199a4e481f682b760db2df7a4e5535
