@@ -323,7 +323,7 @@ kubectl apply -f argocd/apps/
 ```
 
 > 📸 **Screenshot**: A screenshot of your ArgoCD UI with apps in sync here.
-![ArgoCD Dashboard](./images/argocd_deployment.png)
+> ![ArgoCD Dashboard](./images/argocd_deployment.png)
 
 ### 3. Deploy Application with Helm & Kustomize
 
@@ -465,6 +465,6 @@ This project is licensed under the **MIT License** — see the [LICENSE](LICENSE
 
 ⭐ If this project helped you, please consider giving it a star!
 
-**Built with ❤️ by [Your Name] — DevOps Engineer**
+**Built with ❤️ by Liam Le — Software Engineer**
 
 </div>
