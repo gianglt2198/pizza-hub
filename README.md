@@ -107,7 +107,8 @@ This project demonstrates a **production-ready DevOps portfolio** — a real-wor
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
-> 📸 **Screenshot Tip**: Add a screenshot of your ArgoCD dashboard here showing synced applications across environments.
+> 📸 **Screenshot**: A screenshot of your ArgoCD dashboard here showing synced applications across environments.
+> ![ArgoCD Dashboard](./images/argocd_dashboard.png)
 
 ---
 
@@ -321,9 +322,8 @@ argocd admin initial-password -n argocd
 kubectl apply -f argocd/apps/
 ```
 
-> 📸 **Screenshot Tip**: Add a screenshot of your ArgoCD UI with apps in sync here.
-
----
+> 📸 **Screenshot**: A screenshot of your ArgoCD UI with apps in sync here.
+![ArgoCD Dashboard](./images/argocd_deployment.png)
 
 ### 3. Deploy Application with Helm & Kustomize
 
