@@ -1,12 +1,13 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/redis/go-redis/v9"
+	"github.com/jackc/pgx/v5"
 
 	"github.com/gianglt2198/pizza-app/internal/cache"
 	"github.com/gianglt2198/pizza-app/internal/model"
@@ -63,7 +64,7 @@ func (h *PizzaHandler) GetByID(c *gin.Context) {
 
 	p, err := h.repo.FindByID(ctx, id)
 	if err != nil {
-		if err == redis.Nil {
+		if errors.Is(err, pgx.ErrNoRows) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "pizza not found"})
 			return
 		}

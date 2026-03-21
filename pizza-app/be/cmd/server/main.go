@@ -54,7 +54,7 @@ func main() {
 	// Handlers
 	healthHandler := handlers.NewHealthHandler(rdb)
 	pizzaHandler := handlers.NewPizzaHandler(pizzaRepo, rdb)
-	orderHandler := handlers.NewOrderHandler(orderRepo, pizzaRepo, rdb)
+	orderHandler := handlers.NewOrderHandler(orderRepo, pizzaRepo)
 
 	// Router
 	if cfg.App.Env == "production" {

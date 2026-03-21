@@ -1,12 +1,11 @@
-package mocks
+package handlers
 
 import (
 	"context"
 	"time"
 
-	"github.com/stretchr/testify/mock"
-
 	"github.com/gianglt2198/pizza-app/internal/model"
+	"github.com/stretchr/testify/mock"
 )
 
 type MockCache struct {
@@ -29,7 +28,11 @@ func (m *MockCache) Set(ctx context.Context, key string, value any, ttl time.Dur
 }
 
 func (m *MockCache) Delete(ctx context.Context, keys ...string) error {
-	args := m.Called(ctx, keys)
+	callArgs := []any{ctx}
+	for _, k := range keys {
+		callArgs = append(callArgs, k)
+	}
+	args := m.Called(callArgs...)
 	return args.Error(0)
 }
 

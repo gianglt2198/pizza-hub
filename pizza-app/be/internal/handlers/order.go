@@ -7,7 +7,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/gianglt2198/pizza-app/internal/cache"
 	"github.com/gianglt2198/pizza-app/internal/model"
 	"github.com/gianglt2198/pizza-app/internal/repository"
 )
@@ -15,15 +14,13 @@ import (
 type OrderHandler struct {
 	orderRepo repository.OrderRepo
 	pizzaRepo repository.PizzaRepo
-	cache     cache.CacheStore
 }
 
 func NewOrderHandler(
 	orderRepo repository.OrderRepo,
 	pizzaRepo repository.PizzaRepo,
-	cache cache.CacheStore,
 ) *OrderHandler {
-	return &OrderHandler{orderRepo: orderRepo, pizzaRepo: pizzaRepo, cache: cache}
+	return &OrderHandler{orderRepo: orderRepo, pizzaRepo: pizzaRepo}
 }
 
 func (h *OrderHandler) Create(c *gin.Context) {
